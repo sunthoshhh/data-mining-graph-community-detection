@@ -1,0 +1,9 @@
+python-igraph>=0.11
+leidenalg>=0.10
+infomap>=2.7
+networkit>=11      # only needed to regenerate the LFR graphs
+scikit-learn
+pandas
+matplotlib
+scipy
+# graph-tool (Bayesian SBM only) is NOT on pip, see README "Installing graph-tool"

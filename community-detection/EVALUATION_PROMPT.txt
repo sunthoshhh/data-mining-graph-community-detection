@@ -1,0 +1,230 @@
+=====================================================================
+EVALUATION PROMPT: how to analyse your algorithm's results
+=====================================================================
+
+WHAT THIS IS
+A ready-made prompt you paste into Claude (or another AI assistant),
+together with your result files. It walks through your results for
+Experiment 1 (LFR) and Experiment 2 (email) in a fixed order, so all
+four of us get analysis in the same format.
+
+IMPORTANT
+- Check our module's rules on AI use before submitting anything it
+  writes. Treat its output as DRAFT NOTES that you check and rewrite in
+  your own words, not as final text.
+- It can only use the numbers you give it. ALWAYS check every number it
+  quotes against the CSV. If a number is wrong, the report is wrong.
+
+---------------------------------------------------------------------
+STEP 1: RUN EVERYTHING FIRST
+---------------------------------------------------------------------
+
+  python run.py <your_algo> all        (you: your algorithm)
+  python make_figures.py               (needs everyone's CSVs; ask the
+                                        editor if yours is missing)
+
+---------------------------------------------------------------------
+STEP 2: COLLECT THESE FILES
+---------------------------------------------------------------------
+
+Attach to the chat (or paste the contents of the CSVs):
+
+  From results/raw/                        (your algorithm only)
+    [ ] main_<algo>.csv
+    [ ] stability_<algo>.csv
+    [ ] sweep_<algo>.csv          (not for SBM, it has none)
+    [ ] ablation_<algo>.csv
+  From results/
+    [ ] summary_table.csv         (all algorithms, for comparison)
+    [ ] failures.csv              (only if it exists)
+  From data/email/
+    [ ] summary.csv               (email's own mu)
+  From figures/                            (images)
+    [ ] fig1_accuracy_vs_mu.png
+    [ ] fig2_runtime_vs_n.png
+    [ ] fig6_email_bridge.png
+    [ ] your part figure: part1_louvain_leiden.png / part2_infomap.png /
+        part3_sbm.png / part4_spectral.png
+
+Part 1 (Louvain + Leiden): attach the files for BOTH louvain and leiden.
+
+---------------------------------------------------------------------
+STEP 3: FILL IN THE TWO BLANKS BELOW, THEN COPY EVERYTHING BETWEEN
+        THE LINES INTO THE CHAT
+---------------------------------------------------------------------
+
+  [MY ALGORITHM]  = one of: Louvain + Leiden / Infomap / Bayesian SBM /
+                    Spectral clustering
+  [MY PART FOCUS] = copy the matching line from the list at the very
+                    bottom of this file
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>> COPY FROM HERE >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+You are helping me analyse results for a university data mining group
+report comparing community detection algorithms. My part is:
+[MY ALGORITHM]. I've attached our result files and figures.
+
+## Project context (use this, don't assume anything else)
+
+- Methods compared: Louvain, Leiden, Infomap, Bayesian SBM (graph-tool,
+  degree-corrected), Spectral clustering (normalised Laplacian +
+  K-means). Spectral was GIVEN THE TRUE NUMBER OF COMMUNITIES K by the
+  harness; the others were not. Always mention this when comparing
+  Spectral's accuracy.
+- Experiment 1: LFR synthetic graphs with known communities.
+  - Mixing mu = share of each node's links that go to other
+    communities. Higher = harder. Tested mu = 0.2, 0.4, 0.6 at
+    n = 1,000 nodes.
+  - Each mu has 2 different random graphs (graph seeds s1, s2).
+  - Scale test: n = 1,000 / 10,000 / 50,000 at mu = 0.4.
+- Experiment 2: email-Eu-core, a real email network where the "true"
+  communities are 42 departments. data/email/summary.csv gives its own
+  mu, which places it on the LFR difficulty curve.
+- Every graph was run with 5 algorithm seeds (0 to 4). summary_table.csv
+  is already averaged over seeds (NMI = mean, NMI_sd = spread).
+  Fig 1 averages over both graph seeds and algorithm seeds.
+- Metrics: NMI and ARI (1 = matches the truth perfectly, 0 = no
+  better than random); modularity of the found partition vs of the true
+  partition; n_found vs n_true communities; frac_disconnected = share of
+  found communities that are internally split; runtime_s; stability =
+  NMI between runs with different seeds (1 = same answer every time).
+- Runs over 15 minutes were stopped and recorded as "timeout". A timeout
+  is a result, not a missing value.
+
+## Rules
+
+1. Use ONLY numbers that appear in the attached files. Quote them as
+   mean +/- sd with 2 decimals (e.g. "NMI = 0.93 +/- 0.02"). If
+   something I ask for isn't in the data, write "NOT IN DATA". Never
+   estimate or invent a number.
+2. After every number, say which file or figure it came from, in
+   brackets, e.g. (summary_table.csv, mix_mu0.6_s1) or (Fig 1).
+3. Every finding follows CLAIM -> EVIDENCE -> MECHANISM -> SO WHAT:
+   - CLAIM: one sentence
+   - EVIDENCE: the numbers
+   - MECHANISM: WHY, using how [MY ALGORITHM] actually works
+   - SO WHAT: what a practitioner should take away
+4. Don't just restate a figure ("NMI decreases as mu increases").
+   Every finding needs a reason.
+5. Don't invent citations. The only references we use are: Blondel et
+   al. 2008 (Louvain), Traag et al. 2019 (Leiden), Rosvall & Bergstrom
+   2008 (Infomap), Peixoto 2014 (Bayesian SBM), Ng, Jordan & Weiss 2002
+   (Spectral), Lancichinetti et al. 2008 (LFR).
+6. Plain English, short sentences. No filler.
+
+## What I want, in exactly this order and with these headings
+
+### A. Sanity check
+Before any analysis, check and report PASS / PROBLEM for each:
+- Does [MY ALGORITHM] score NMI >= 0.9 on the easy graphs (mu = 0.2)?
+  If not, it may be a bug rather than a finding. Say so.
+- Are there 5 runs per graph (seed 0 to 4), except where a timeout
+  stopped the remaining seeds?
+- List every row whose status is not "ok" (timeouts, errors, memory).
+- Anything that looks strange (e.g. n_found = 1, NMI exactly 0, huge
+  sd, runtime far out of line with the other methods).
+
+### B. Experiment 1 (LFR): the facts
+A small table for [MY ALGORITHM] with one row per graph: NMI, ARI,
+n_found vs n_true, runtime_s, stability. Then 3 bullet points stating
+WHAT happened (no explanations yet):
+- accuracy as mu rises: where does it start to drop?
+- scale: runtime from 1k to 10k to 50k, and whether accuracy held
+- how it ranks against the other methods at mu = 0.6 and at 50k
+
+### C. Experiment 2 (email): the facts
+- NMI, ARI, n_found vs n_true (42), runtime on email
+- email's own mu, and what LFR would have PREDICTED for this method at
+  that mu (read it off Fig 1 / Fig 6). Did the prediction hold?
+- rank against the other methods on email
+
+### D. Why it behaved this way (the core of my section)
+2 to 3 findings in CLAIM -> EVIDENCE -> MECHANISM -> SO WHAT form,
+covering Experiments 1 and 2. Explain the behaviour through how
+[MY ALGORITHM] works. Include one clear SUCCESS case and one clear
+FAILURE case. Focus especially on: [MY PART FOCUS]
+
+### E. Parameter sensitivity
+From sweep_<algo>.csv and panel (b) of my part figure: where is the
+best parameter value on LFR vs on email? How much NMI is lost by
+using the default (1.0) compared with the best value (the "oracle gap")?
+What would happen in real use, where there's no answer key to tune on?
+If my algorithm has no parameter (Bayesian SBM), explain why that is
+both a strength and a weakness.
+
+### F. Ablation
+From ablation_<algo>.csv and panel (c): for each variant, how much does
+NMI change compared with the default, and on which graphs? What does
+that tell us each component contributes?
+
+### G. Draft of my report section (section 5)
+Using A to F, write a draft in EXACTLY this template, within the word
+limits:
+
+  5.X [MY ALGORITHM] (Author, Year)
+  How it works (max 80 words): its idea of a community in one sentence,
+    then 3-4 numbered steps.
+  Settings we used (max 30 words)
+  Performance in Experiments 1 and 2 (max 100 words): one success, one
+    failure, each explained.
+  Parameter sensitivity (max 50 words)
+  Ablation (max 50 words)
+  Strengths and weaknesses (max 40 words): 2 of each, tied to the
+    mechanism.
+
+For Louvain + Leiden: do the full template for Louvain, then add
+"Leiden: what it changes" (max 100 words) covering the refinement step,
+frac_disconnected for both, and the effect on results.
+
+Give a word count for each part.
+
+### H. Hand-off notes for the shared sections
+- 2 bullet facts (with numbers) for the Experiment 1 section writer
+- 1 bullet fact (with numbers) for the Experiment 2 section writer
+- My row for the ranking table, one short entry per criterion:
+  Accuracy easy (mu 0.2) | Accuracy hard (mu 0.6) | Email | Speed at 50k |
+  Stability | Needs K / tuning?
+- My row for Table 1: Objective | Search strategy | Must be told K? |
+  Tunable parameter | Randomness from | Complexity
+
+### I. Things I must double-check
+List any claim above that depends on an assumption, or where the data
+was thin (e.g. only 1 run because of a timeout), so I can verify it.
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<< COPY TO HERE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+---------------------------------------------------------------------
+[MY PART FOCUS]: copy the line for your part
+---------------------------------------------------------------------
+
+Louvain + Leiden:
+  the resolution limit (did it merge small communities, especially at
+  50k? compare n_found with n_true), Louvain vs Leiden as a single-
+  component ablation (refinement step, frac_disconnected), and why
+  modularity can score the wrong answer higher than the truth at high mu.
+
+Infomap:
+  why it collapses at high mu (what happens to the random walker when
+  most links leave a community), how much 10 restarts (trials_10) fix
+  that, and the Markov time sweep.
+
+Bayesian SBM:
+  choosing K automatically (compare n_found with n_true), what degree
+  correction adds (no_deg_corr variant), and the runtime cost and
+  timeouts at scale.
+
+Spectral clustering:
+  the fact it was given the true K (how much does that flatter it?),
+  what happens with wrong K (k_factor sweep) or estimated K
+  (eigengap_k variant), and why eigenvectors get expensive at 50k.
+
+---------------------------------------------------------------------
+STEP 4: AFTER YOU GET THE ANSWER
+---------------------------------------------------------------------
+
+  [ ] Check EVERY number against the CSV files
+  [ ] Check the sanity check (A). If anything says PROBLEM, tell the
+      editor before writing
+  [ ] Rewrite section G in your own words and paste it into the shared
+      report doc under 5.X
+  [ ] Send section H to the editor (it feeds sections 3, 4 and 6)

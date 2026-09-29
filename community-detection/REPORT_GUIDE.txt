@@ -1,0 +1,332 @@
+=====================================================================
+REPORT GUIDE
+Community detection: Louvain, Leiden, Infomap, Bayesian SBM, Spectral
+=====================================================================
+
+This is how the report is structured and how each person writes their
+part, so the four of us produce one consistent report instead of four
+mini-reports.
+
+Target length: about 4 pages of main text (it can run slightly over).
+Extra figures go in the appendix.
+
+
+
+*********************************************************************
+BEFORE YOU START: WHAT ARE "SEEDS" AND HOW MANY RUNS ARE THERE?
+*********************************************************************
+
+A "seed" is just a number that fixes the randomness, so a random
+process gives the same result every time you rerun it. We use seeds
+in TWO different places. Don't mix them up.
+
+  1. GRAPH SEEDS: 2 per setting  (the "s1" and "s2" in folder names)
+     We BUILT 2 different random versions of each easy/medium/hard LFR
+     graph, e.g. mix_mu0.4_s1 and mix_mu0.4_s2. Same difficulty,
+     different random network. This is already done. You don't
+     touch it.
+
+  2. ALGORITHM SEEDS: 5 per graph  (the "seed" column, 0 to 4, in CSVs)
+     Most algorithms are a bit random inside (which node they look at
+     first, where K-means starts, etc.). So the harness runs YOUR
+     algorithm 5 times on EVERY graph with seeds 0, 1, 2, 3, 4.
+     This happens automatically when you type  python run.py <algo> all
+
+So for ONE algorithm, the harness does:
+
+  Experiment 1 (LFR)
+    6 mixing graphs  (mu 0.2 / 0.4 / 0.6, each with s1 and s2)
+  + 2 scale graphs   (10k and 50k nodes)
+  = 8 graphs x 5 algorithm seeds          = 40 runs
+
+  Experiment 2 (email)
+    1 graph x 5 algorithm seeds            =  5 runs
+
+  (plus the parameter sweep and ablation runs, also automatic)
+
+YOU DO NOT AVERAGE ANYTHING BY HAND.
+make_figures.py averages all the runs for you:
+  - In the figures, each point = the average of all runs, and the
+    small error bar = how much the runs disagreed.
+  - In results/summary_table.csv, each row = one graph + one
+    algorithm, already averaged over the 5 seeds (NMI = mean,
+    NMI_sd = spread).
+  - For the mu = 0.2 / 0.4 / 0.6 points in Fig 1, the s1 and s2 graphs
+    are averaged together too (2 graphs x 5 seeds = 10 runs per point).
+
+In the report you write ONE number per result, like:
+  "NMI = 0.93 +/- 0.02 (mean +/- sd over 5 seeds)"
+
+If a run on the 50k graph times out, the harness skips the other seeds
+for that graph. That is expected, and it counts as a result.
+*********************************************************************
+
+---------------------------------------------------------------------
+1. THE STORYLINE (everyone should know this)
+---------------------------------------------------------------------
+
+  "We test 5 community detection methods from 4 different paradigms on
+   synthetic graphs where we know the answer, find exactly where and
+   why each one breaks, then check whether those lessons survive on a
+   real network."
+
+Every section should serve that sentence. If a paragraph doesn't help
+answer "which method, when does it break, and why", cut it.
+
+Why these methods (use this in the introduction). Each one has a
+different idea of what a community is:
+
+  Part 1  Louvain, Leiden
+          Paradigm: modularity optimisation
+          Community = denser inside than a random graph would predict
+
+  Part 2  Infomap
+          Paradigm: information flow
+          Community = where a random walker gets trapped
+
+  Part 3  Bayesian SBM
+          Paradigm: statistical inference
+          Community = groups that explain the edge pattern, in the most
+          compressed way
+
+  Part 4  Spectral clustering
+          Paradigm: linear algebra + K-means
+          Community = nodes that sit close together in the graph's
+          eigenvector space
+
+
+---------------------------------------------------------------------
+2. OVERALL STRUCTURE
+---------------------------------------------------------------------
+
+The report goes: both experiments with all algorithms, then a deep dive
+into each algorithm, then one consolidated comparison.
+
+  1. Introduction                        1/3 page    Owner: Editor
+     The problem, why it's hard (no labels in practice), our question,
+     why these 4 paradigms, contributions in 3 bullet points.
+
+  2. Experimental setup                  1/2 page    Owner: Editor
+     Datasets (LFR + email-Eu-core), metrics (NMI, ARI, modularity),
+     5 seeds per graph, 15-min time limit, hardware, and "all methods
+     run through one shared harness".
+
+  3. Experiment 1: LFR benchmark,        3/4 page    Owner: ___________
+     all algorithms
+     Figures: Fig 1 (accuracy vs mu), Fig 2 (runtime vs n),
+              Fig 3 (stability)
+     WHAT happened, stated with numbers. Who stays accurate as mu rises,
+     who breaks first and at what mu, who is fastest, who times out.
+     Keep it factual. The WHY belongs in section 5.
+
+  4. Experiment 2: email-Eu-core,        1/2 page    Owner: ___________
+     all algorithms
+     Figures: Fig 6 (email placed on the LFR curve),
+              Fig 10 (which departments get merged or split)
+     WHAT happened. Scores on the real network, where email sits on the
+     LFR difficulty curve (its own mu), and whether the LFR ranking held.
+
+  5. Algorithm analysis, one per part    about 1/2 page each
+     5.1 Louvain + Leiden                Owner: ___________
+     5.2 Infomap                         Owner: ___________
+     5.3 Bayesian SBM                    Owner: ___________
+     5.4 Spectral clustering             Owner: ___________
+     Each owner explains how their method works, then WHY it performed
+     the way it did in Experiments 1 and 2, plus its own parameter and
+     ablation tests. Template in section 3 of this guide.
+     Each part has its own figure: figures/part1_louvain_leiden.png,
+     part2_infomap.png, part3_sbm.png, part4_spectral.png
+
+  6. Consolidated comparison and         1/2 page    Owner: Editor
+     recommendation
+     Figures: Fig 4 (modularity gap), Fig 8 (disconnected communities),
+              results/summary_table.csv
+     WHICH method to use when. One ranking table across all criteria,
+     the cross-method insights, the recommendation, and limitations.
+     Template in section 4 of this guide.
+
+  Appendix                               any length  Owner: anyone
+     Fig 5a/5b (all sweeps together), Fig 7 (all ablations), Fig 9,
+     full summary table, failures.csv.
+
+Total: about 4 1/2 pages.
+
+THE THREE-LAYER RULE (this stops us repeating ourselves):
+  Sections 3-4 say WHAT happened.       ("Infomap drops to 0.38 at mu = 0.6.")
+  Section 5 says WHY, per algorithm.    ("Because at high mixing the random
+                                          walker no longer gets trapped...")
+  Section 6 says WHICH to choose.       ("For weakly separated communities,
+                                          prefer ...")
+If you catch yourself explaining WHY in section 3, move it to section 5.
+
+
+---------------------------------------------------------------------
+3. ALGORITHM ANALYSIS: TEMPLATE FOR EACH PART (section 5)
+---------------------------------------------------------------------
+
+Every part uses the same headings in the same order, so the four
+sections line up. About 350 words each, plus your part figure.
+
+  5.X <Algorithm name> (<Author, Year>)
+
+  How it works (max 80 words)
+    Its idea of a community in one sentence, then 3-4 numbered steps.
+    Mechanism only, no history.
+
+  Settings we used (max 30 words)
+    What can be tuned, what we used and why.
+
+  Performance in Experiments 1 and 2 (max 100 words)
+    Point back to Figs 1, 2, 3 and 6 for YOUR method. Explain WHY it
+    did well or badly using the mechanism above. Include one clear
+    success and one clear failure.
+
+  Parameter sensitivity (max 50 words)
+    Your sweep (panel b of your part figure). Where is the best value?
+    Is it the same on LFR and email? What if you don't know it?
+    (SBM has no parameter: say why that's a strength and a weakness.)
+
+  Ablation (max 50 words)
+    Your on/off tests (panel c). What does each component contribute?
+
+  Strengths and weaknesses (max 40 words)
+    2 of each, each tied to the mechanism, not generic ("fast",
+    "popular").
+
+PART 1 (LOUVAIN + LEIDEN) gets about 450 words, since it covers two
+methods. Do the full template for Louvain. Then add "Leiden: what it
+changes" (max 100 words): the refinement step, the Louvain flaw it
+fixes (Fig 8), and what that did to the results. The pair is our
+cleanest ablation, since the two differ in exactly one component.
+
+PART-SPECIFIC POINTS TO COVER:
+  Louvain + Leiden  Resolution limit (lost small communities at 50k,
+                    Fig 9); refinement vs disconnected communities.
+  Infomap           Collapse at high mu; how much restarts (trials_10)
+                    help; Markov time behaviour.
+  Bayesian SBM      Chooses K itself; degree correction; runtime cost
+                    and timeouts.
+  Spectral          Was given the true K (always say so); what happens
+                    with wrong K or eigengap-estimated K; eigenvector
+                    cost at scale.
+
+Also add one row per method to the comparison table (Table 1, goes in
+section 2). Columns:
+  Method | Objective | Search strategy | Must be told K? |
+  Tunable parameter | Randomness from | Complexity
+
+
+---------------------------------------------------------------------
+4. EXPERIMENT AND CONSOLIDATED SECTIONS: HOW TO WRITE THEM
+---------------------------------------------------------------------
+
+Sections 3, 4 and 6 use a four-step pattern for each finding.
+
+  CLAIM      One sentence, the finding.
+             e.g. "Leiden stays accurate longest as mixing increases."
+
+  EVIDENCE   Point to the figure and give numbers.
+             e.g. "At mu = 0.6, Leiden keeps NMI = X vs Y for Infomap
+             (Fig. 1)."
+
+  MECHANISM  In sections 3-4, keep this to a pointer: "(see 5.2)".
+             In section 6, give the cross-method reason.
+
+  SO WHAT    What a practitioner should take away.
+
+BANNED: sentences that only restate the figure ("As shown in Fig. 1,
+NMI decreases as mu increases.") without a point.
+
+Section 6 must include this ranking table:
+
+  Criterion                       | Louvain | Leiden | Infomap | SBM | Spectral
+  Accuracy, easy (mu = 0.2)       |         |        |         |     |
+  Accuracy, hard (mu = 0.6)       |         |        |         |     |
+  Real network (email)            |         |        |         |     |
+  Speed at 50k                    |         |        |         |     |
+  Stability across seeds          |         |        |         |     |
+  Needs K / tuning?               |         |        |         |     |
+
+Then answer:
+  - Does any method find a partition with HIGHER modularity than the
+    truth (Fig 4)? What does that say about modularity as an objective?
+  - Did LFR predict the email results? Why or why not?
+  - Recommendation: "use X by default, Y when..., avoid Z when...".
+  - Limitations: one real dataset, 5 seeds, Colab hardware, Spectral
+    given the true K.
+
+
+How this covers the marking criteria:
+
+  Produce results ourselves
+    -> All numbers come from our harness runs (results/raw/)
+  Strengths and weaknesses
+    -> Section 5 (each part), section 6 ranking
+  Parameter settings ("e.g. K in K-means")
+    -> Section 5 parameter sensitivity; Spectral's K sweep is the
+       direct equivalent
+  Ablation of key components
+    -> Section 5 ablation, where every method has at least one test
+  Key factors affecting performance
+    -> Section 3 (mixing, size), section 5 (why), Fig 3 (seeds)
+  Compare methods
+    -> Sections 3, 4 and 6
+  Success and failure cases
+    -> Section 5 (one each per part), Fig 10; timeouts as results
+  Other analysis
+    -> Modularity gap (Fig 4), LFR-to-real bridge (Fig 6)
+
+
+---------------------------------------------------------------------
+5. STYLE RULES (so it reads as one voice)
+---------------------------------------------------------------------
+
+  - Numbers: 2 decimals for NMI and ARI, reported as mean +/- sd over
+    seeds (e.g. 0.93 +/- 0.02). Runtime in seconds with 2 significant
+    figures. A timeout is written as "> 900 s", not left blank.
+  - Names: always "Louvain", "Leiden", "Infomap", "Bayesian SBM" and
+    "Spectral clustering". Write the Greek letter mu (μ), not "mu".
+  - Figures: only use the ones from make_figures.py, so colours and
+    markers are the same everywhere. Every figure is referenced in the
+    text, and every caption says what to notice.
+  - Fairness: always mention that Spectral was given the true K when
+    you compare its accuracy with the others.
+  - Tense: present tense for findings ("Leiden recovers..."), past tense
+    for what we did ("We ran...").
+  - Voice: "we", short sentences, no filler ("It is worth noting
+    that...").
+  - Citations: Blondel et al. 2008 (Louvain), Traag et al. 2019
+    (Leiden), Rosvall & Bergstrom 2008 (Infomap), Peixoto 2014
+    (Bayesian SBM), Ng, Jordan & Weiss 2002 (Spectral), Lancichinetti
+    et al. 2008 (LFR) and SNAP for email-Eu-core.
+
+
+---------------------------------------------------------------------
+6. DEFINITION OF DONE (per person)
+---------------------------------------------------------------------
+
+  [ ] python run.py <algo> smoke   says PASSED
+  [ ] python run.py <algo> all     finished, and the CSVs are committed
+      to results/raw/
+  [ ] Results analysed using EVALUATION_PROMPT.txt, every number
+      checked against the CSVs
+  [ ] Part write-up (section 5) filled in with the template, within
+      the word limits, using your part figure
+  [ ] Table 1 row added
+  [ ] Any shared section you own (3, 4 or 6) drafted with
+      Claim -> Evidence -> Mechanism -> So what
+  [ ] Any crash or timeout written up as a finding, not hidden
+
+
+---------------------------------------------------------------------
+7. TIMELINE
+---------------------------------------------------------------------
+
+  Week 1   Everyone passes smoke (SBM owner: graph-tool installed);
+           "How it works" drafts in
+  Week 2   All "all" runs committed; make_figures.py run once by the
+           editor and figures shared
+  Week 3   Part write-ups (section 5) and sections 3, 4, 6 drafted
+  1 week before deadline
+           Full draft together; editor does a single-voice pass
+  Deadline Submit

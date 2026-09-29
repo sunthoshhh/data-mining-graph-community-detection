@@ -1,0 +1,9 @@
+name,experiment,n,edges,avg_degree,mu_target,mu_actual,communities,seed,gen_seconds
+mix_mu0.2_s1,mixing,1000,9755,19.5,0.2,0.212,23,1,0.0
+mix_mu0.2_s2,mixing,1000,10029,20.1,0.2,0.21,20,2,0.1
+mix_mu0.4_s1,mixing,1000,9755,19.5,0.4,0.417,23,1,0.0
+mix_mu0.4_s2,mixing,1000,10029,20.1,0.4,0.416,20,2,0.0
+mix_mu0.6_s1,mixing,1000,9755,19.5,0.6,0.613,23,1,0.0
+mix_mu0.6_s2,mixing,1000,10029,20.1,0.6,0.612,20,2,0.0
+scale_n10000,scale,10000,99673,19.9,0.4,0.416,239,1,0.3
+scale_n50000,scale,50000,500323,20.0,0.4,0.416,1134,1,2.1
