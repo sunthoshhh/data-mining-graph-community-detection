@@ -1,0 +1,10 @@
+algorithm,graph,dataset,experiment,mu_target,graph_seed,runs,between_run_nmi_mean,between_run_nmi_min
+Bayesian SBM,mix_mu0.2_s1,lfr,mixing,0.2,1,5,1.0,1.0
+Bayesian SBM,mix_mu0.2_s2,lfr,mixing,0.2,2,5,0.9918713060859881,0.9798322945069653
+Bayesian SBM,mix_mu0.4_s1,lfr,mixing,0.4,1,5,1.0,0.9999999999999999
+Bayesian SBM,mix_mu0.4_s2,lfr,mixing,0.4,2,5,0.9969402942179887,0.9923507355449717
+Bayesian SBM,mix_mu0.6_s1,lfr,mixing,0.6,1,5,0.8158345336898932,0.7808692987009943
+Bayesian SBM,mix_mu0.6_s2,lfr,mixing,0.6,2,5,0.7667703753228611,0.6963408107837131
+Bayesian SBM,scale_n10000,lfr,scale,0.4,1,5,0.9800323841713648,0.9747500720316038
+Bayesian SBM,scale_n50000,lfr,scale,0.4,1,5,0.9471512016605331,0.9403968558648547
+Bayesian SBM,email,email,real,,,5,0.8555088959447266,0.8315230694428367
