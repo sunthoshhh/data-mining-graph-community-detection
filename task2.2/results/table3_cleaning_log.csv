@@ -1,0 +1,9 @@
+step,DAVIS,KIBA
+Matrix positions,"30,056","483,419"
+"Missing (NaN, unmeasured)",0,"365,165"
+Non-finite invalid (inf),0,0
+Kd ≤ 0 (invalid),0,–
+"Screening-limit Kd = 10,000 nM (kept, flagged)","20,931",–
+"Low outliers < 9.03 (kept, flagged)",–,20
+"Exact zero scores (kept, flagged)",–,1
+Valid observed pairs after cleaning,"30,056","118,254"

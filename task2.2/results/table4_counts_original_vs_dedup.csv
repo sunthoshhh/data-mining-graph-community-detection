@@ -1,0 +1,7 @@
+,DAVIS,DAVIS,DAVIS,KIBA,KIBA,KIBA
+,Original (IDs),Cleaned (IDs),"Deduplicated (SMILES, sequence)",Original (IDs),Cleaned (IDs),"Deduplicated (SMILES, sequence)"
+Ligands,68,68,68,2111,2111,2068
+Targets,442,442,379,229,229,229
+Observed pairs,30056,30056,25772,118254,118254,117657
+Matrix positions,30056,30056,25772,483419,483419,473572
+Sparsity (missing / all positions),0.00%,0.00%,0.00%,75.54%,75.54%,75.16%

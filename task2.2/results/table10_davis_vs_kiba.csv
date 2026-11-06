@@ -1,0 +1,9 @@
+,DAVIS,KIBA
+Size (dedup ligands × targets),68 × 379,2068 × 229
+Observed pairs (dedup),"25,772","117,657"
+Sparsity,0% (complete),75.16%
+Score,pKd from a single assay type (Kd),"Composite of Ki, Kd, IC50"
+Typical score,"median 5.00, mean 5.45","median 11.50, mean 11.72"
+Main abnormality,69.6% of pairs at screening limit pKd = 5,20 extreme low values incl. one 0.0; missingness is not random
+Variance explained by ligand + target means,35.3%,52.1%
+Duplicate issue,"18 sequence groups merge 81 target IDs (mutants, domains)",32 SMILES groups merge 75 ligand IDs (stereoisomers)

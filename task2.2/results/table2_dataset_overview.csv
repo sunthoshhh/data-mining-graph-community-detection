@@ -1,0 +1,7 @@
+,DAVIS,KIBA
+Ligand ID type,PubChem CID,ChEMBL ID
+Target ID type,Kinase gene name (incl. mutants),UniProt accession
+Score,"Kd (nM), lower = stronger","KIBA score (supplied scale), higher = stronger"
+Score used,pKd = 9 − log10(Kd),KIBA score as supplied
+"SMILES length (median, min–max)",60 (39–92),54 (20–590)
+"Sequence length (median, min–max)",707 (244–2549),620 (215–4128)

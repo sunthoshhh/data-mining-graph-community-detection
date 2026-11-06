@@ -1,0 +1,5 @@
+,DAVIS,KIBA
+Ligand mean only,0.226,0.42
+Target mean only,0.126,0.141
+Ligand + target (additive),0.353,0.521
+Unexplained (interaction + noise),0.647,0.479

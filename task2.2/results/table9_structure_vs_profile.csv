@@ -1,0 +1,5 @@
+dataset,entity,pairs compared,Spearman ρ
+DAVIS,ligands,2278,0.27
+KIBA,ligands,820286,0.114
+DAVIS,targets,71631,0.114
+KIBA,targets,17086,0.231
